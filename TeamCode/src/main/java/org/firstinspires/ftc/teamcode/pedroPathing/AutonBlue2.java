@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
@@ -11,9 +12,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
-
-@Autonomous(name = "NewAutonBlue", group = "Examples")
-public class NewAutonRealLeft extends OpMode {
+/*
+New Pathing for Auton Left
+ */
+@Autonomous(name = "AutonBlue2", group = "Examples")
+public class AutonBlue2 extends OpMode {
 
     private Servo hood;
 
@@ -35,7 +38,7 @@ public class NewAutonRealLeft extends OpMode {
 
     private int count;
     private final Pose startPose = new Pose(24, 120, Math.toRadians(0)); // Start Pose of our robot.
-    private final Pose scorePose = new Pose(36, 108, Math.toRadians(45)); // Scoring Pose of our robot. It is facing the wall.
+    private final Pose scorePose = new Pose(36, 108, Math.toRadians(0)); // Scoring Pose of our robot. It is facing the wall.
     private final Pose pickup1Pose = new Pose(20, 84, Math.toRadians(0)); // Highest (First Set) of Artifacts.
 //    private final Pose pickup3Pose = new Pose(42, 60, Math.toRadians(180)); // Middle (Second Set) of Artifacts from the Spike Mark.
     private final Pose pickup1CPose = new Pose(22,100);
@@ -117,8 +120,7 @@ public class NewAutonRealLeft extends OpMode {
         /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         grabPickup1 = follower.pathBuilder()
                 .addPath(new BezierCurve(scorePose, pickup1CPose, pickup1Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-                .setVelocityConstraint(0.01)
+                .setTangentHeadingInterpolation()
                 .build();
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
@@ -135,14 +137,10 @@ public class NewAutonRealLeft extends OpMode {
 //                .setVelocityConstraint(0.01)
 //                .build();
         grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup2CPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2CPose.getHeading())
+                .addPath(new BezierCurve(scorePose, pickup2CPose, pickup2Pose))
+                .setTangentHeadingInterpolation()
                 .build();
 
-        grabPickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2CPose, pickup2Pose))
-                .setLinearHeadingInterpolation(pickup2CPose.getHeading(), pickup2Pose.getHeading())
-                .build();
         /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
 //        scorePickup2 = follower.pathBuilder()
 //                .addPath(new BezierLine(pickup2Pose, pickup3Pose))
@@ -160,23 +158,16 @@ public class NewAutonRealLeft extends OpMode {
         scorePickup2 = follower.pathBuilder()
                 .addPath(new BezierLine(pickup2Pose, scorePose))
                 .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading())
-                .setVelocityConstraint(.01)
                 .build();
 
-        grabPickup4 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup3CPose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3CPose.getHeading())
-                .build();
-
-        grabPickup5 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup3CPose, pickup3Pose))
-                .setLinearHeadingInterpolation(pickup3CPose.getHeading(), pickup3Pose.getHeading())
+        grabPickup3 = follower.pathBuilder()
+                .addPath(new BezierCurve(scorePose, pickup3CPose, pickup3Pose))
+                .setTangentHeadingInterpolation()
                 .build();
 
         scorePickup3 = follower.pathBuilder()
                 .addPath(new BezierLine(pickup3Pose, scorePose))
                 .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
-                .setVelocityConstraint(.01)
                 .build();
     }
 
@@ -239,14 +230,14 @@ public class NewAutonRealLeft extends OpMode {
                             setPathState(State.PICKUP2);
                             count++;
                         } else if (count == 3) {
-                            follower.followPath(grabPickup4);
-                            setPathState(State.PICKUP4);
+                            follower.followPath(grabPickup3);
+                            setPathState(State.PICKUP3);
                             count++;
 
                         }
                         else if(count == 4)
                         {
-                            follower.followPath(grabPickup4);
+                            follower.followPath(grabPickup1);
                             setPathState(State.END);
                         }
 
@@ -298,8 +289,8 @@ public class NewAutonRealLeft extends OpMode {
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     follower.setMaxPower(.75);
-                    follower.followPath(grabPickup3, true);
-                    setPathState(State.PICKUP3);
+                    follower.followPath(scorePickup2, true);
+                    setPathState(State.SCORING);
                 }
                 break;
             case PICKUP3:
@@ -308,27 +299,27 @@ public class NewAutonRealLeft extends OpMode {
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     follower.setMaxPower(.9);
-                    follower.followPath(scorePickup2, true);
+                    follower.followPath(scorePickup3, true);
                     setPathState(State.SCORING);
                     //IntakeInner.setVelocity(300);
                     //IntakeOuter.setVelocity(-300);
 
                 }
                 break;
-            case PICKUP4:
-                if(!follower.isBusy()){
-
-                    follower.followPath(grabPickup5);
-                    setPathState(State.PICKUP5);
-                }
-                break;
-            case PICKUP5:
-                if(!follower.isBusy()){
-
-                    follower.followPath(scorePickup3);
-                    setPathState(State.SCORING);
-                }
-                break;
+//            case PICKUP4:
+//                if(!follower.isBusy()){
+//
+//                    follower.followPath(grabPickup5);
+//                    setPathState(State.PICKUP5);
+//                }
+//                break;
+//            case PICKUP5:
+//                if(!follower.isBusy()){
+//
+//                    follower.followPath(scorePickup3);
+//                    setPathState(State.SCORING);
+//                }
+//                break;
 
 
             case END:
