@@ -262,8 +262,8 @@ public class TempTeleop extends OpMode {
         if (gamepad1.a && !intakeOn && !debounceA){
             debounceA = true;
             intakeOn = true;
-            intakeOuter.setPower(-.8);
-            intakeInner.setPower(.4);
+            intakeOuter.setPower(-1);
+            intakeInner.setPower(1);
         }
         if (gamepad1.a && intakeOn && !debounceA){
             debounceA = true;
@@ -438,7 +438,7 @@ public class TempTeleop extends OpMode {
                     -gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
                     -gamepad1.right_stick_x,
-                    true // Robot Centric
+                    true // Roboft Centric
             );
 
                 //This is how it looks with slowMode on
