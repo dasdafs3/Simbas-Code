@@ -42,11 +42,17 @@ public class AutonBlue2 extends OpMode {
     private final Pose pickup1Pose = new Pose(20, 84, Math.toRadians(0)); // Highest (First Set) of Artifacts.
 //    private final Pose pickup3Pose = new Pose(42, 60, Math.toRadians(180)); // Middle (Second Set) of Artifacts from the Spike Mark.
     private final Pose pickup1CPose = new Pose(22,100, Math.toRadians(0));
+
+    private final Pose pickup1C2Pose = new Pose(48,98, Math.toRadians(0));
     private final Pose pickup2Pose = new Pose(20, 60, Math.toRadians(0)); // Second Row of Artifacts from the Spike Mark.
     private final Pose pickup2CPose = new Pose(23,89, Math.toRadians(0));
 
+    private final Pose pickup2C2Pose = new Pose(50,97, Math.toRadians(0));
+
     private final Pose pickup3Pose = new Pose(20, 36, Math.toRadians(0));
     private final Pose pickup3CPose = new Pose(23,76, Math.toRadians(0));
+
+    private final Pose pickup3C2Pose = new Pose(49,94, Math.toRadians(0));
 
     private Path scorePreload;
 
@@ -120,12 +126,12 @@ public class AutonBlue2 extends OpMode {
         /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         grabPickup1 = follower.pathBuilder()
                 .addPath(new BezierCurve(scorePose, pickup1CPose, pickup1Pose))
-                .setTangentHeadingInterpolation()
+                .setConstantHeadingInterpolation(Math.toRadians(135))
                 .build();
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1Pose, scorePose))
+                .addPath(new BezierCurve(pickup1Pose, pickup1C2Pose, scorePose))
                 .setTangentHeadingInterpolation()
                 .build();
 
@@ -156,7 +162,7 @@ public class AutonBlue2 extends OpMode {
 
         /* This is our scorePickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2Pose, scorePose))
+                .addPath(new BezierCurve(pickup2Pose,pickup2C2Pose, scorePose))
                 .setTangentHeadingInterpolation()
                 .build();
 
@@ -166,7 +172,7 @@ public class AutonBlue2 extends OpMode {
                 .build();
 
         scorePickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup3Pose, scorePose))
+                .addPath(new BezierCurve(pickup3Pose, pickup3C2Pose, scorePose))
                 .setTangentHeadingInterpolation()
                 .build();
     }
