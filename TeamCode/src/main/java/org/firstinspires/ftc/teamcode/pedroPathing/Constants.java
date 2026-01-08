@@ -36,7 +36,7 @@ public class Constants {
 
 
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1)    ;
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
@@ -60,6 +60,7 @@ public class Constants {
             //86.9 -> 89.6
             //89.6 -> 72.94
             .yVelocity(56.39);
+
             //76.42 -> 75.919
             //75.1 -> 56.39
     public static PinpointConstants localizerConstants = new PinpointConstants()
