@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
+import android.net.EthernetNetworkSpecifier;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -17,9 +19,13 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 //import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorMROpticalDistance;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.function.Supplier;
 
@@ -73,6 +79,7 @@ public class RedTeleOp extends OpMode {
 
     private  boolean debounceBACK;
 
+    private boolean debounceStart;
     private boolean debounceGUIDE;
 
     private boolean debounceLEFT_TRIGGER;
@@ -82,6 +89,7 @@ public class RedTeleOp extends OpMode {
     private boolean feederOn;
     private DcMotorEx intakeInner;
 
+    private DistanceSensor distanceSensor;
     private CRServo feederL;
 
     private CRServo feederR;
@@ -107,6 +115,7 @@ public class RedTeleOp extends OpMode {
         flywheelLeft.setDirection(DcMotor.Direction.FORWARD);
         flywheelRight.setDirection(DcMotor.Direction.REVERSE);
         imu = hardwareMap.get(IMU.class, "imu");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
         imu.initialize(
                 new IMU.Parameters(
                         new RevHubOrientationOnRobot(
@@ -423,6 +432,39 @@ public class RedTeleOp extends OpMode {
             debounceY = true;
         }
 
+        if(gamepad1.start && debounceStart){
+          //code here!
+            debounceStart = false;
+            double ballsPassed = 0;
+            flywheelOn = true;
+            flywheelLeft.setVelocity(flywheelVelocity);
+            flywheelRight.setVelocity(flywheelVelocity);
+            actiontimer.resetTimer();
+            double OgHoodPos = hood.getPosition();
+            while (ballsPassed < 3 || actiontimer.getElapsedTimeSeconds() < 4){
+                if (actiontimer.getElapsedTimeSeconds() >= 2){
+                    //loop through balls here
+                    intakeOuter.setPower(-.8);
+                    intakeInner.setPower(.4);
+
+                    if (distanceSensor.getDistance(DistanceUnit.CM) < 4){
+                        hood.setPosition(hood.getPosition() + .02);
+                        ballsPassed++;
+                    }
+
+
+                }
+
+            }
+
+
+        }
+        if(!gamepad1.start){
+            debounceStart = true;
+        }
+
+
+
         if (!automatedDrive) {
 
 
@@ -476,6 +518,7 @@ public class RedTeleOp extends OpMode {
         telemetryM.debug("automatedDrive", automatedDrive);
         telemetry.addData("YAW", imu.getRobotYawPitchRollAngles().getYaw());
         telemetry.addData("distance", distance);
+        telemetry.addData("Distance Sensor", distanceSensor.getDistance(DistanceUnit.CM));
 
     }
 }
