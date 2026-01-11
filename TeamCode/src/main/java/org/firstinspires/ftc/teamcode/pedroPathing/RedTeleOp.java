@@ -41,6 +41,7 @@ public class RedTeleOp extends OpMode {
 
     private Servo raxon;
 
+    private  Servo gate;
     private Servo laxon;
     private Servo blocker;
     private Servo hood;
@@ -115,6 +116,7 @@ public class RedTeleOp extends OpMode {
         flywheelLeft.setDirection(DcMotor.Direction.FORWARD);
         flywheelRight.setDirection(DcMotor.Direction.REVERSE);
         imu = hardwareMap.get(IMU.class, "imu");
+        gate = hardwareMap.get(Servo.class, "gate");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "distanceSensor");
         imu.initialize(
                 new IMU.Parameters(
@@ -214,8 +216,15 @@ public class RedTeleOp extends OpMode {
 
 
 
-        flywheelVelocity = .0701544 * Math.pow(distance,2) - 3.07502 * distance + 1626.87017;
+        //flywheelVelocity = .0701544 * Math.pow(distance,2) - 3.07502 * distance + 1626.87017;
         //hood.setPosition(.259228 * Math.sin(.03483 * distance + .48236) + .752718);
+        if (gamepad1.left_stick_button){
+            gate.setPosition(0);
+        }
+        if ( gamepad1.right_stick_button){
+            gate.setPosition(.1);
+        }
+
         if(raxonPos > 1)
         {
             raxonPos = 1;
@@ -434,6 +443,7 @@ public class RedTeleOp extends OpMode {
 
         if(gamepad1.start && debounceStart){
           //code here!
+            blocker.setPosition(.3);
             debounceStart = false;
             double ballsPassed = 0;
             flywheelOn = true;
@@ -441,7 +451,8 @@ public class RedTeleOp extends OpMode {
             flywheelRight.setVelocity(flywheelVelocity);
             actiontimer.resetTimer();
             double OgHoodPos = hood.getPosition();
-            while (ballsPassed < 3 || actiontimer.getElapsedTimeSeconds() < 4){
+            while (ballsPassed < 3 && actiontimer.getElapsedTimeSeconds() < 4){
+                blocker.setPosition(5);
                 if (actiontimer.getElapsedTimeSeconds() >= 2){
                     //loop through balls here
                     intakeOuter.setPower(-.8);
@@ -456,6 +467,9 @@ public class RedTeleOp extends OpMode {
                 }
 
             }
+            blocker.setPosition(.3);
+            intakeOuter.setPower(0);
+            intakeInner.setPower(0);
 
 
         }
@@ -519,6 +533,7 @@ public class RedTeleOp extends OpMode {
         telemetry.addData("YAW", imu.getRobotYawPitchRollAngles().getYaw());
         telemetry.addData("distance", distance);
         telemetry.addData("Distance Sensor", distanceSensor.getDistance(DistanceUnit.CM));
+        telemetry.addData("gate", gate.getPosition() );
 
     }
 }
