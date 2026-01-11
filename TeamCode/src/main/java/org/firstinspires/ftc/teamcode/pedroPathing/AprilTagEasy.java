@@ -124,6 +124,23 @@ public class AprilTagEasy extends LinearOpMode {
         laxonPos = Math.max(MIN_POS, Math.min(MAX_POS, laxonPos));
         raxonPos = Math.max(MIN_POS, Math.min(MAX_POS, raxonPos));
 
+        if(raxonPos > 1)
+        {
+            raxonPos = 1;
+        }
+        if(raxonPos < .1894)
+        {
+            raxonPos = .1894;
+        }
+        if(laxonPos < .1894)
+        {
+            laxonPos = .1894;
+        }
+        if(laxonPos > 1)
+        {
+            laxonPos = 1;
+        }
+
         laxon.setPosition(laxonPos);
         raxon.setPosition(raxonPos);
 
