@@ -196,7 +196,7 @@ public class AutonNearPrototype extends OpMode {
                 hood.setPosition(.57);
 
                 follower.setMaxPower(0.9);
-                follower.followPath(scorePreload);
+                follower.followPath(score1);
                 setPathState(State.SCORING);
                 actionTimer.resetTimer();
 
@@ -254,8 +254,13 @@ public class AutonNearPrototype extends OpMode {
                         }
                         else if(count == 4)
                         {
-                            follower.followPath(grabPickup1);
+                            follower.followPath(end);
                             setPathState(State.END);
+                        }
+                        else if(count == 0)
+                        {
+                            follower.followPath(scorePreload);
+                            setPathState(State.START);
                         }
 
                     }
@@ -323,13 +328,13 @@ public class AutonNearPrototype extends OpMode {
 
                 }
                 break;
-//            case PICKUP4:
-//                if(!follower.isBusy()){
-//
-//                    follower.followPath(grabPickup5);
-//                    setPathState(State.PICKUP5);
-//                }
-//                break;
+            case PICKUP4:
+                if(!follower.isBusy()){
+
+                    follower.followPath(score4);
+                    setPathState(State.SCORING);
+                }
+                break;
 //            case PICKUP5:
 //                if(!follower.isBusy()){
 //
@@ -386,7 +391,7 @@ public class AutonNearPrototype extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
-        follower.setStartingPose(startPose);
+        follower.setStartingPose(scorePose);
 
 
 
