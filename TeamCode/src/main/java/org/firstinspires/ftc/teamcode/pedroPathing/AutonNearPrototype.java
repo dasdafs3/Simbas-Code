@@ -191,9 +191,6 @@ public class AutonNearPrototype extends OpMode {
     public void autonomousPathUpdate() {
         switch (state) {
             case START:
-                flywheelLeft.setVelocity(1700);
-                flywheelRight.setVelocity(1700);
-                hood.setPosition(.57);
 
                 follower.setMaxPower(0.9);
                 follower.followPath(score1);
@@ -261,6 +258,7 @@ public class AutonNearPrototype extends OpMode {
                         {
                             follower.followPath(scorePreload);
                             setPathState(State.START);
+                            count++;
                         }
 
                     }
@@ -406,7 +404,7 @@ public class AutonNearPrototype extends OpMode {
     @Override
     public void start() {
         opmodeTimer.resetTimer();
-        setPathState(State.START);
+        setPathState(State.SCORING);
     }
 
     /** We do not use this because everything should automatically disable **/
