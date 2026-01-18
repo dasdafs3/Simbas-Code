@@ -24,9 +24,9 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 //import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.SensorMROpticalDistance;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.subsystems.Alliance;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 import java.util.function.Supplier;
 
@@ -36,75 +36,40 @@ public class RedTeleOp extends OpMode {
     private Follower follower;
 
     private boolean debounceA;
-    private Timer pathTimer;
+    private Timer pathTimer, actiontimer, timerA;
 
-    private  Timer actiontimer;
+    private Servo raxon, gate, laxon, blocker, hood;
 
-    private  Timer timerA;
-
-    private Servo raxon;
-
-    private  Servo gate;
-    private Servo laxon;
-    private Servo blocker;
-    private Servo hood;
-
-    private double x;
-    private double y;
+    private double x, y;
 
     double ballsPassed;
+    
     private double distance;
-    private boolean debounceB;
-
-    private boolean debounceX;
+    private boolean debounceB, debounceX, automatedDrive, autoTarget = false, slowMode = false, intakeOn, flywheelOn, kickerpos, feederOn;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
-    private boolean automatedDrive;
     private Supplier<PathChain> pathChain;
-
-    private boolean autoTarget = false;
     private TelemetryManager telemetryM;
-    private boolean slowMode = false;
 
-    private DcMotorEx flywheelLeft;
-
-    private DcMotorEx flywheelRight;
-
-    private DcMotorEx intakeOuter;
-    private boolean intakeOn;
-    private boolean flywheelOn;
+    private DcMotorEx flywheelLeft, flywheelRight, intakeOuter;
 
     private IMU imu;
-    private boolean kickerpos;
-
-    private boolean debounce_dpad_up;
-    private boolean debounce_dpad_down;
-    private boolean debounceY;
-
-    private boolean debounceDL, debounceDR, debounceLB, debounceRB;
-
-    private  boolean debounceBACK;
-
-    private boolean debounceStart;
-    private boolean debounceGUIDE;
-
-    private boolean debounceLEFT_TRIGGER;
-    private boolean debounceRIGHT_TRIGGER;
+    private boolean debounce_dpad_up, debounce_dpad_down, debounceY, debounceDL, debounceDR, debounceLB, debounceRB, debounceBACK, debounceStart, debounceGUIDE, debounceLEFT_TRIGGER, debounceRIGHT_TRIGGER;
 
     private double flywheelVelocity;
-    private boolean feederOn;
     private DcMotorEx intakeInner;
 
     private DistanceSensor distanceSensor;
     private CRServo feederL;
 
     private CRServo feederR;
-    private double raxonPos;
-    private double laxonPos;
+    private double raxonPos, laxonPos;
     private double slowModeMultiplier = 0.5;
     private double angleToRot;
 
 
     private PathChain parkingSpace, scoringSpot;
+
+    private Turret turret;
 
     @Override
     public void init() {
@@ -173,6 +138,8 @@ public class RedTeleOp extends OpMode {
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(23.687, 119.835))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(180), 0.8))
                 .build();
+
+        turret = new Turret(hardwareMap, follower, Alliance.RED);
     }
 
     @Override
@@ -199,18 +166,9 @@ public class RedTeleOp extends OpMode {
     public void loop() {
 
 
+        turret.isAuto = autoTarget;
 
-
-        if(autoTarget)
-        {
-            x = follower.getPose().getX();
-            y = follower.getPose().getY();
-            angleToRot = (imu.getRobotYawPitchRollAngles().getYaw()) - Math.toDegrees(Math.atan((138-y)/(138-x)));
-            laxonPos = .4889 + (.2705/90)*angleToRot;
-            raxonPos = .4889 + (.2705/90)*angleToRot;
-        }
-
-
+        turret.update(); // Run the turret subsystem
 
 
         //
@@ -351,18 +309,13 @@ public class RedTeleOp extends OpMode {
         }
 
         if (gamepad1.left_trigger > .01 && debounceLEFT_TRIGGER){
-            raxonPos = raxon.getPosition() +.02;
-            laxonPos = laxon.getPosition() - .02;
-            laxon.setPosition(laxonPos);
-            raxon.setPosition(raxonPos);
+            turret.spinLeft();
 
             debounceLEFT_TRIGGER = false;
         }
         if (gamepad1.right_trigger > .01 && debounceRIGHT_TRIGGER){
-            raxonPos = raxon.getPosition() - .02;
-            laxonPos = laxon.getPosition() + .02;
-            raxon.setPosition(raxonPos);
-            laxon.setPosition(laxonPos);
+            turret.spinRight();
+
             debounceRIGHT_TRIGGER = false;
 
         }
@@ -558,4 +511,3 @@ public class RedTeleOp extends OpMode {
 
     }
 }
-
